@@ -4,8 +4,11 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
+from flask_bcrypt import Bcrypt
 
 api = Blueprint('api', __name__)
+app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 
 @api.route('/hello', methods=['POST', 'GET'])
@@ -21,10 +24,11 @@ def handle_hello():
 def create_user():
     email = request.json.get("email")
     password = request.json.get("password")
+    secure_password = bcrypt.generate_password_hash(password, 10).decode("utf-8")
     #new_user = User(email=data.email, password=data.password)
     new_user = User()
     new_user.email = email
-    new_user.password = password
+    new_user.password = secure_password
     new_user.is_active = True
     db.session.add(new_user)
     db.session.commit()
