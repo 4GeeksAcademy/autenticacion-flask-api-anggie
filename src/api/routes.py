@@ -55,7 +55,7 @@ def login_user():
 
     token = create_access_token(
         identity=user.id, additional_claims={"role": "admin"})
-    return jsonify({"msg": "Login succesfull", "token": token}), 200
+    return jsonify({"msg": "Login succesful", "token": token}), 200
 
 
 @api.route('/helloprotected')
