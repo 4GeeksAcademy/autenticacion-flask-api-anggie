@@ -1,10 +1,19 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
+import { useNavigate } from "react-router-dom";
 import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 
 export const Home = () => {
   const { store, actions } = useContext(Context);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    //Si hay una sesion iniciada andate a la pagina demo
+    if (store.accessToken) {
+      navigate("/demo");
+    }
+  }, [store.accessToken]);
 
   async function login(e) {
     e.preventDefault();

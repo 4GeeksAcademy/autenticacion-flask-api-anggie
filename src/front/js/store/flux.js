@@ -39,6 +39,29 @@ const getState = ({ getStore, getActions, setStore }) => {
         return { code: resp.status, data };
       },
 
+      apiFetchProtected: async (endpoint, method = "GET", body = null) => {
+        //se crea el objeto parametros, con todo lo necesario para la peticion
+        //INCLUIDO EL TOKEN EN EL ENCABEZADO DE LA AUTORIZACION
+        const { accessToken } = getStore();
+        const params = {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + accessToken,
+          },
+        };
+        console.log(accessToken);
+        //Si hay un body, se agrega a los parametros
+        if (body) params.body = JSON.stringify(body);
+        //la peticion termina siendo el endpoint con los parametros que definieron
+        const resp = await fetch(
+          process.env.BACKEND_URL + "/api" + endpoint,
+          params
+        );
+        const data = await resp.json();
+        return { code: resp.status, data };
+      },
+
       loadTokens: () => {
         let token = localStorage.getItem("accessToken");
         setStore({ accessToken: token });
@@ -63,7 +86,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 
       signup: (email, password) => {},
 
-      getUserInfo: () => {},
+      getUserInfo: async () => {
+        const { apiFetchProtected } = getActions();
+        const resp = await apiFetchProtected("/helloprotected");
+        setStore({ userInfo: resp.data });
+        return "Ok";
+      },
 
       exampleFunction: () => {
         getActions().changeColor(0, "green");
