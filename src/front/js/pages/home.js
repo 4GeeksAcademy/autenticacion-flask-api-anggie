@@ -1,7 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
-import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 
 export const Home = () => {
@@ -26,6 +25,7 @@ export const Home = () => {
   }
   return (
     <div className="text-center container mt-5">
+      <h1>Login</h1>
       <form onSubmit={login}>
         <div className="mb-3">
           <label htmlFor="exampleInputEmail1" className="form-label">
@@ -54,7 +54,7 @@ export const Home = () => {
           />
         </div>
         <button type="submit" className="btn btn-primary">
-          Submit
+          Iniciar sesion
         </button>
       </form>
     </div>

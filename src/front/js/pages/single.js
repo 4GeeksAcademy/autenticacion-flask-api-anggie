@@ -1,28 +1,58 @@
 import React, { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Context } from "../store/appContext";
-import rigoImageUrl from "../../img/rigo-baby.jpg";
 
-export const Single = props => {
-	const { store, actions } = useContext(Context);
-	const params = useParams();
+export const Single = (props) => {
+  const { store, actions } = useContext(Context);
+  const params = useParams();
+  const navigate = useNavigate();
 
-	return (
-		<div className="jumbotron">
-			<h1 className="display-4">This will show the demo element: {store.demo[params.theid].title}</h1>
-			<img src={rigoImageUrl} />
-			<hr className="my-4" />
-
-			<Link to="/">
-				<span className="btn btn-primary btn-lg" href="#" role="button">
-					Back home
-				</span>
-			</Link>
-		</div>
-	);
+  async function signup(e) {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const email = data.get("email");
+    const password = data.get("password");
+    const { signup } = actions;
+    let resp = await signup(email, password);
+    console.log(resp);
+    navigate("/");
+  }
+  return (
+    <div className="text-center container mt-5">
+      <h1>Signup</h1>
+      <form onSubmit={signup}>
+        <div className="mb-3">
+          <label htmlFor="exampleInputEmail1" className="form-label">
+            Email address
+          </label>
+          <input
+            type="email"
+            className="form-control"
+            name="email"
+            id="exampleInputEmail1"
+            aria-describedby="emailHelp"
+          />
+          <div id="emailHelp" className="form-text"></div>
+        </div>
+        <div className="mb-3">
+          <label htmlFor="exampleInputPassword1" className="form-label">
+            Password
+          </label>
+          <input
+            type="password"
+            className="form-control"
+            name="password"
+            id="exampleInputPassword1"
+          />
+        </div>
+        <button type="submit" className="btn btn-primary">
+          Registrarse
+        </button>
+      </form>
+    </div>
+  );
 };
-
 Single.propTypes = {
-	match: PropTypes.object
+  match: PropTypes.object,
 };

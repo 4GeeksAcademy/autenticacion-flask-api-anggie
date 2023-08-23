@@ -4,18 +4,6 @@ const getState = ({ getStore, getActions, setStore }) => {
       accessToken: null,
       userInfo: null,
       message: null,
-      demo: [
-        {
-          title: "FIRST",
-          background: "white",
-          initial: "white",
-        },
-        {
-          title: "SECOND",
-          background: "white",
-          initial: "white",
-        },
-      ],
     },
     actions: {
       // Use getActions to call a function within a fuction
@@ -43,16 +31,20 @@ const getState = ({ getStore, getActions, setStore }) => {
         //se crea el objeto parametros, con todo lo necesario para la peticion
         //INCLUIDO EL TOKEN EN EL ENCABEZADO DE LA AUTORIZACION
         const { accessToken } = getStore();
+        if (!accessToken) {
+          return "No token";
+        }
         const params = {
           method,
           headers: {
-            "Content-Type": "application/json",
             Authorization: "Bearer " + accessToken,
           },
         };
-        console.log(accessToken);
         //Si hay un body, se agrega a los parametros
-        if (body) params.body = JSON.stringify(body);
+        if (body) {
+          params.headers["Content-Type"] = "application/json";
+          params.body = JSON.stringify(body);
+        }
         //la peticion termina siendo el endpoint con los parametros que definieron
         const resp = await fetch(
           process.env.BACKEND_URL + "/api" + endpoint,
@@ -64,7 +56,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 
       loadTokens: () => {
         let token = localStorage.getItem("accessToken");
-        setStore({ accessToken: token });
+        if (token) {
+          setStore({ accessToken: token });
+        }
       },
 
       login: async (email, password) => {
@@ -84,7 +78,22 @@ const getState = ({ getStore, getActions, setStore }) => {
         return "Login Successful";
       },
 
-      signup: (email, password) => {},
+      signup: async (email, password) => {
+        const { apiFetchPublic } = getActions();
+        const resp = await apiFetchPublic("/signup", "POST", {
+          email,
+          password,
+        });
+        if (resp.code != 201) {
+          console.error("Signup error");
+          return resp;
+        }
+      },
+
+      logout: () => {
+        setStore({ accessToken: null });
+        localStorage.setItem("accessToken", null);
+      },
 
       getUserInfo: async () => {
         const { apiFetchProtected } = getActions();
@@ -93,9 +102,9 @@ const getState = ({ getStore, getActions, setStore }) => {
         return "Ok";
       },
 
-      exampleFunction: () => {
-        getActions().changeColor(0, "green");
-      },
+      // exampleFunction: () => {
+      //   getActions().changeColor(0, "green");
+      // },
 
       getMessage: async () => {
         try {
@@ -110,20 +119,20 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      changeColor: (index, color) => {
-        //get the store
-        const store = getStore();
+      // changeColor: (index, color) => {
+      //   //get the store
+      //   const store = getStore();
 
-        //we have to loop the entire demo array to look for the respective index
-        //and change its color
-        const demo = store.demo.map((elm, i) => {
-          if (i === index) elm.background = color;
-          return elm;
-        });
+      //   //we have to loop the entire demo array to look for the respective index
+      //   //and change its color
+      //   const demo = store.demo.map((elm, i) => {
+      //     if (i === index) elm.background = color;
+      //     return elm;
+      //   });
 
-        //reset the global store
-        setStore({ demo: demo });
-      },
+      //   //reset the global store
+      //   setStore({ demo: demo });
+      // },
     },
   };
 };
